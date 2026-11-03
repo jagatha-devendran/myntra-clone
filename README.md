@@ -73,7 +73,14 @@ erDiagram
 | `DELETE` | `/wishlist/{productId}` | Authenticated | Removes a product from the wishlist. |
 | `GET` | `/wishlist/` | Authenticated | Fetches all items in the user's wishlist with full product metadata. |
 
-### 5. Address Book (`/v2/addresses`)
+### 5. Coupons & Promotions (`/coupons` or `/gateway/v1/coupons`)
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/coupons` | Public | Retrieves all active promotional coupons with minimum spend and discount terms. |
+| `POST` | `/coupons/apply` | Authenticated | Validates and applies a coupon code against the cart total. |
+| `POST` | `/coupons/remove` | Authenticated | Removes the applied coupon from the session. |
+
+### 6. Address Book (`/v2/addresses`)
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/v2/addresses/` | Authenticated | Adds a new shipping address. |
@@ -81,7 +88,7 @@ erDiagram
 | `DELETE` | `/v2/addresses/unifiedIds/{addressId}` | Authenticated | Soft/hard deletes an address by ID. |
 | `GET` | `/v2/addresses/my/address` | Authenticated | Lists all saved delivery addresses for the user. |
 
-### 6. Orders & Checkout (`/orders`)
+### 7. Orders & Checkout (`/orders`)
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/orders` | Authenticated | Places an order from the cart. Supports Cash on Delivery (`COD`) and Online Payment (`ONLINE` via Razorpay). |
@@ -89,7 +96,7 @@ erDiagram
 | `GET` | `/orders/{orderId}` | Authenticated | Returns detailed status, snapshot delivery address, and line items for a specific order. |
 | `PUT` | `/orders/{orderId}/cancel` | Authenticated | Cancels an eligible pending order. |
 
-### 7. Payment Verification (`/payments`)
+### 8. Payment Verification (`/payments`)
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/payments/verify` | Authenticated | Validates Razorpay `razorpay_order_id`, `razorpay_payment_id`, and HMAC-SHA256 signature, triggers stock deduction, marks order as `CONFIRMED` / `PAID`, and clears the cart. |
@@ -188,6 +195,12 @@ src/main/java/com/myntra/clone/
 │   ├── entity/                     # CartItems entity
 │   ├── repository/                 # CartRepository
 │   └── Service/                    # Bag calculation & stock verification
+├── coupon/                         # Coupons & promotions context
+│   ├── controller/                 # Coupon application endpoints
+│   ├── dto/                        # Coupon validation & application DTOs
+│   ├── entity/                     # Coupon entity
+│   ├── repository/                 # CouponRepository
+│   └── service/                    # Coupon validation & discount rules
 ├── order/                          # Order processing & lifecycle context
 │   ├── controller/                 # Order creation & tracking controllers
 │   ├── dto/                        # Order placement & summary records
