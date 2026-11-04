@@ -3,6 +3,8 @@ import com.myntra.clone.cart.entity.CartItems;
 import com.myntra.clone.cart.repository.CartRepository;
 import com.myntra.clone.catalog.entity.ProductImage;
 import com.myntra.clone.catalog.repository.ProductImageRepository;
+import com.myntra.clone.coupon.entity.Coupon;
+import com.myntra.clone.coupon.repository.CouponRepository;
 import com.myntra.clone.order.dto.*;
 import com.myntra.clone.order.entity.Order;
 import com.myntra.clone.order.entity.OrderItem;
@@ -33,6 +35,7 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final RazorpayService razorpayService;
     private final ProductImageRepository productImageRepository;
+    private final CouponRepository couponRepository;
 
     @Autowired
     public OrderService(
@@ -42,7 +45,8 @@ public class OrderService {
             AuthRepository authRepository,
             CartRepository cartItemsRepository,
             RazorpayService razorpayService,
-            ProductImageRepository productImageRepository) {
+            ProductImageRepository productImageRepository,
+            CouponRepository couponRepository) {
 
         this.orderRepository = orderRepository;
         this.shippingAddressRepository = shippingAddressRepository;
@@ -51,6 +55,7 @@ public class OrderService {
         this.cartItemsRepository = cartItemsRepository;
         this.razorpayService = razorpayService;
         this.productImageRepository = productImageRepository;
+        this.couponRepository = couponRepository;
     }
 
     @Transactional
@@ -140,8 +145,10 @@ public class OrderService {
             order.addItem(orderItem);
         }
 
-        // 7. Calculate final amount
-        BigDecimal discount = BigDecimal.ZERO;
+        Coupon coupon = couponRepository.findById(request.couponId()).orElseThrow(() -> new RuntimeException("Coupon Id not found"));
+
+        // Calculate final amount
+        BigDecimal discount = coupon.getDiscountValue();
         BigDecimal shippingFee = BigDecimal.ZERO;
         BigDecimal tax = BigDecimal.ZERO;
 

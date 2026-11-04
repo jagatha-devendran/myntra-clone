@@ -17,6 +17,9 @@ import java.util.Optional;
 @Service
 public class CouponService {
 
+    public BigDecimal discountAmount;
+
+
     private final CouponRepository couponRepository;
     private final CartRepository cartRepository;
 
@@ -89,7 +92,7 @@ public class CouponService {
             );
         }
 
-        BigDecimal discountAmount = calculateDiscount(coupon, orderAmount);
+        discountAmount = calculateDiscount(coupon, orderAmount);
         BigDecimal finalAmount = orderAmount.subtract(discountAmount).max(BigDecimal.ZERO);
 
         return new ApplyCouponResponse(

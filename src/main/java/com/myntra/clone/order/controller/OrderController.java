@@ -48,7 +48,6 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
-    // 3. Get Individual Order Details
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderDetails(
             @PathVariable Long orderId,
