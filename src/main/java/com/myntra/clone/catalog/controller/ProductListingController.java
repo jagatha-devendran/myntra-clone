@@ -3,6 +3,7 @@ package com.myntra.clone.catalog.controller;
 import com.myntra.clone.catalog.dto.ProductListingResponse;
 import com.myntra.clone.catalog.service.ProductService;
 import com.myntra.clone.user.entity.Users;
+import com.myntra.clone.user.service.AuthenticatedUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,10 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ProductListingController {
 
     private final ProductService productService;
+    private final AuthenticatedUserService authenticatedUserService;
 
-    ProductListingController(ProductService theProductService, ProductService productService){
-        this.productService = productService;
-
+    ProductListingController(ProductService theProductService, AuthenticatedUserService theAuthenticatedUserService ){
+        this.productService = theProductService;
+        authenticatedUserService = theAuthenticatedUserService;
     }
 
     @GetMapping("/{categorySlug}")
@@ -28,22 +30,12 @@ public class ProductListingController {
             @PathVariable("categorySlug") String categorySlug,
             @RequestParam(value = "f", required = false) String filter,
             @RequestParam(value = "p", defaultValue = "1") int page,
-            @RequestParam(value = "rows", defaultValue = "50") int rows
-    ){
-        Long userId = getAuthenticatedUserId();
+            @RequestParam(value = "rows", defaultValue = "50") int rows){
+        Long userId = authenticatedUserService.getCurrentUserId();
         ProductListingResponse response = productService.getProductsByCategory(categorySlug, filter, page, rows, userId);
         return ResponseEntity.ok(response);
     }
 
-    public Long getAuthenticatedUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getPrincipal() instanceof Users user) {
-            return user.getId();
-        }
-
-        return null;
-    }
 
 
 }
